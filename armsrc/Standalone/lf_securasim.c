@@ -15,7 +15,6 @@
 // See LICENSE.txt for the text of the license.
 //-----------------------------------------------------------------------------
 // Borrows some code, albeit modified, from client/src/cmdlfsecurakey.c
-// main code for LF aka SamyRun by Samy Kamkar
 //-----------------------------------------------------------------------------
 
 #include "standalone.h" // standalone definitions
@@ -25,17 +24,17 @@
 #include "lfops.h"
 #include "util.h"
 #include "dbprint.h"
-#include "ticks.h"
-
-#include <string.h>       // memcpy
-#include <ctype.h>        // tolower
-#include "commonutil.h"   // ARRAYLEN
 
 void ModInfo(void) {
     DbpString("  LF Securakey standalone simulator (HumbleDeer)");
 }
 
 void RunMod(void) {
+
+    // 12-byte / 24-bit HEX "raw" data goes here.
+    // err, actually, currently it doesn't do anything at all.
+    // Change your ID/raw code in the "uint8_t raw_bytes[12]" a little further in. ⬇️
+    #define raw_hex = "7FCC0004436002AF34880000"
 
     StandAloneMode();
 
@@ -49,10 +48,10 @@ void RunMod(void) {
 
         WDT_HIT();
 
-        // exit from SamyRun,   send a usbcommand.
+        // exit the main loop and wait for expected USB command.
         if (data_available()) break;
 
-        // Was our button held down or pressed?
+        // Was the button pressed for longer than X milliseconds?
         int button_pressed = BUTTON_HELD(300);
         if (button_pressed != BUTTON_HOLD){
             continue;
@@ -63,8 +62,7 @@ void RunMod(void) {
 
         WAIT_BUTTON_RELEASED();
 
-        #define raw_hex = "7FCC0004436002AF34880000" // 12-byte / 24-bit HEX "raw" data (for reference)
-
+        // Byte-separated version of the raw HEX code. This converts it into a bytearray. Should be automated/with terminal input in the future.
         uint8_t raw_bytes[12] = {0x7F, 0xCC, 0x00, 0x04, 0x43, 0x60, 0x02, 0xAF, 0x34, 0x88, 0x00, 0x00}; // The HEX string, but bytes
         int raw_bytes_length = sizeof(raw_bytes);
 
@@ -79,7 +77,6 @@ void RunMod(void) {
         CmdASKsimTAG((uint8_t) 1, (uint8_t) 0, (uint8_t) 0, (uint8_t) 40, (uint16_t) sizeof(raw_bits), (uint8_t) raw_bits, true);
 
         DbpString("[=] Deploying payload finished!");
-            
             
     }
 
