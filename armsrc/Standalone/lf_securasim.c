@@ -26,7 +26,7 @@
 #include "dbprint.h"
 
 void ModInfo(void) {
-    DbpString("  LF Securakey standalone simulator (HumbleDeer)");
+    DbpString("Secura Key Radio Key (125 kHz) simulator (HumbleDeer)");
 }
 
 void RunMod(void) {
